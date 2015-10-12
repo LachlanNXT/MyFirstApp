@@ -1,6 +1,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MyActivity">
+
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+        android:orderInCategory="100" app:showAsAction="never" >
+    <menu>
+        <item
+            android:id="@+id/send_a"
+            android:title="Send A" />
+        <item
+            android:id="@+id/send_b"
+            android:title="Send B" />
+        <item
+            android:id="@+id/send_c"
+            android:title="Send C" />
+        <item
+            android:id="@+id/send_d"
+            android:title="Send D"/>
+        <item
+            android:id="@+id/send_pcent"
+            android:title="Send %"/>
+        <item
+            android:id="@+id/send_$"
+            android:title="Send $"/>
+    </menu>
+
+    </item>
+
 </menu>
