@@ -150,6 +150,7 @@ public class MyActivity extends AppCompatActivity {
     private int readFromSerial() {
 
         int numBytesRead;
+        byte buffer[] = new byte[16];
 
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
@@ -177,8 +178,8 @@ public class MyActivity extends AppCompatActivity {
             sPort.open(connection);
             sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
 
-            byte buffer[] = new byte[16];
             numBytesRead = sPort.read(buffer, 500);
+
         } catch (IOException e) {
             // Deal with error.
             try {
@@ -190,9 +191,13 @@ public class MyActivity extends AppCompatActivity {
             return -1;
         }
 
+        String message = "";
+        for (int i = 0; i<buffer.length; i++) {
+            message = message + Byte.toString(buffer[i]);
+        }
         TextView textView = new TextView(this);
         textView.setTextSize(40);
-        textView.setText(Integer.toString(numBytesRead));
+        textView.setText(Integer.toString(numBytesRead)+" "+message);
         setContentView(textView);
         return numBytesRead;
 
