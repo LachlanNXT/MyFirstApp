@@ -59,7 +59,7 @@ public class MyActivity extends AppCompatActivity {
 
             case R.id.send_serial:
                 message = "a";
-                writetoserial(message.getBytes());
+                writeToSerial(message.getBytes());
                 return true;
 
             case R.id.read_serial:
@@ -94,11 +94,11 @@ public class MyActivity extends AppCompatActivity {
         byte[] byteMessage = message.getBytes();
         //intent.putExtra(EXTRA_MESSAGE, message);
         //startActivity(intent);
-        writetoserial(byteMessage);
+        writeToSerial(byteMessage);
 
     }
 
-    private void writetoserial(byte[] letter) {
+    private void writeToSerial(byte[] letter) {
         byte[] sendable = new byte[letter.length + 1];
         for (int i = 0; i < letter.length; i++) {
             sendable[i] = letter[i];
