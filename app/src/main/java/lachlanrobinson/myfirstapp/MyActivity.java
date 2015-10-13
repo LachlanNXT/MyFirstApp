@@ -20,21 +20,11 @@ import java.util.List;
 
 public class MyActivity extends AppCompatActivity {
 
-    SerialReadData readResult = new SerialReadData(-1, new byte[16]);
-
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
+
+    // initialise required variables for serial communication
+    SerialReadData readResult = new SerialReadData(-1, new byte[16]);
     private static UsbSerialPort sPort = null;
-
-    public void sendMessage(View view) {
-        //Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-        String message = editText.getText().toString();
-        byte[] byteMessage = message.getBytes();
-        //intent.putExtra(EXTRA_MESSAGE, message);
-        //startActivity(intent);
-        writetoserial(byteMessage);
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +84,17 @@ public class MyActivity extends AppCompatActivity {
 
         }
 
+
+    }
+
+    public void sendMessage(View view) {
+        //Intent intent = new Intent(this, DisplayMessageActivity.class);
+        EditText editText = (EditText) findViewById(R.id.edit_message);
+        String message = editText.getText().toString();
+        byte[] byteMessage = message.getBytes();
+        //intent.putExtra(EXTRA_MESSAGE, message);
+        //startActivity(intent);
+        writetoserial(byteMessage);
 
     }
 
