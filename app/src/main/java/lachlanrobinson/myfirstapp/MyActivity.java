@@ -1,29 +1,26 @@
 package lachlanrobinson.myfirstapp;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import android.hardware.usb.UsbManager;
-import android.hardware.usb.UsbDeviceConnection;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.List;
-import java.lang.String;
-import java.lang.Byte;
 
 public class MyActivity extends AppCompatActivity {
 
-    int readResult = -1;
+    SerialReadData readResult = new SerialReadData(-1, new byte[16]);
 
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
     private static UsbSerialPort sPort = null;
@@ -101,15 +98,15 @@ public class MyActivity extends AppCompatActivity {
     }
 
     private void writetoserial(byte[] letter) {
-        byte[] sendable = new byte[letter.length+1];
-        for (int i=0; i<letter.length; i++){
+        byte[] sendable = new byte[letter.length + 1];
+        for (int i = 0; i < letter.length; i++) {
             sendable[i] = letter[i];
         }
         sendable[letter.length] = 0x0A;
 
         //remove spurious line endings so the serial device doesn't get confused
-        for (int i=0; i<sendable.length-1; i++){
-            if (sendable[i] == 0x0A){
+        for (int i = 0; i < sendable.length - 1; i++) {
+            if (sendable[i] == 0x0A) {
                 sendable[i] = 0x0B;
             }
         }
@@ -147,7 +144,7 @@ public class MyActivity extends AppCompatActivity {
         }
     }
 
-    private int readFromSerial() {
+    private SerialReadData readFromSerial() {
 
         int numBytesRead;
         byte buffer[] = new byte[16];
@@ -159,7 +156,7 @@ public class MyActivity extends AppCompatActivity {
             textView.setTextSize(40);
             textView.setText(Integer.toString(-1));
             setContentView(textView);
-            return -1;
+            return new SerialReadData(-1, new byte[16]);
         }
 
         UsbSerialDriver driver = availableDrivers.get(0);
@@ -170,7 +167,7 @@ public class MyActivity extends AppCompatActivity {
             textView.setTextSize(40);
             textView.setText(Integer.toString(-1));
             setContentView(textView);
-            return -1;
+            return new SerialReadData(-1, new byte[16]);
         }
 
         try {
@@ -188,19 +185,17 @@ public class MyActivity extends AppCompatActivity {
                 // Ignore.
             }
             sPort = null;
-            return -1;
+            return new SerialReadData(-1, new byte[16]);
         }
 
         String message = "";
-        for (int i = 0; i<buffer.length; i++) {
+        for (int i = 0; i < buffer.length; i++) {
             message = message + Byte.toString(buffer[i]);
         }
         TextView textView = new TextView(this);
         textView.setTextSize(40);
-        textView.setText(Integer.toString(numBytesRead)+" "+message);
+        textView.setText(Integer.toString(numBytesRead) + " " + message);
         setContentView(textView);
-        return numBytesRead;
-
-
+        return new SerialReadData(numBytesRead, buffer);
     }
 }
