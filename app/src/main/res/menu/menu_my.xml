@@ -6,23 +6,18 @@
         android:orderInCategory="100" app:showAsAction="never" >
     <menu>
         <item
-            android:id="@+id/send_a"
-            android:title="Send A" />
+            android:id="@+id/send_serial"
+            android:title="Send Serial" />
         <item
-            android:id="@+id/send_b"
-            android:title="Send B" />
+            android:id="@+id/read_serial"
+            android:title="Read Serial" />
         <item
-            android:id="@+id/send_c"
-            android:title="Send C" />
+            android:id="@+id/change_text"
+            android:title="Change Text" />
         <item
-            android:id="@+id/send_d"
-            android:title="Send D"/>
-        <item
-            android:id="@+id/send_pcent"
-            android:title="Send %"/>
-        <item
-            android:id="@+id/send_$"
-            android:title="Send $"/>
+            android:id="@+id/reset"
+            android:title="Reset" />
+
     </menu>
 
     </item>

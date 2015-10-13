@@ -14,6 +14,7 @@ import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbDeviceConnection;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +22,8 @@ import java.lang.String;
 import java.lang.Byte;
 
 public class MyActivity extends AppCompatActivity {
+
+    int readResult = -1;
 
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
     private static UsbSerialPort sPort = null;
@@ -39,6 +42,11 @@ public class MyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set the text view as the activity layout
+        TextView textView = new TextView(this);
+        textView.setTextSize(40);
+        textView.setText("Read Result");
+        //setContentView(textView);
         setContentView(R.layout.activity_my);
     }
 
@@ -62,34 +70,25 @@ public class MyActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
 
-            case R.id.send_a:
+            case R.id.send_serial:
                 message = "a";
                 writetoserial(message.getBytes());
                 return true;
 
-            case R.id.send_b:
-                message = "a|a";
-                writetoserial(message.getBytes());
+            case R.id.read_serial:
+                readResult = readFromSerial();
                 return true;
 
-            case R.id.send_c:
-                message = "a|a|a";
-                writetoserial(message.getBytes());
+            case R.id.change_text:
+                TextView textView = new TextView(this);
+                textView.setTextSize(40);
+                textView.setText("Text Changed!");
+                setContentView(textView);
+
                 return true;
 
-            case R.id.send_d:
-                message = "a|a|a|a";
-                writetoserial(message.getBytes());
-                return true;
-
-            case R.id.send_pcent:
-                message = "a|a|a|a|a";
-                writetoserial(message.getBytes());
-                return true;
-
-            case R.id.send_$:
-                message = "a|a|a|a|a";
-                writetoserial(message.getBytes());
+            case R.id.reset:
+                setContentView(R.layout.activity_my);
                 return true;
 
             default:
@@ -146,5 +145,57 @@ public class MyActivity extends AppCompatActivity {
             sPort = null;
             return;
         }
+    }
+
+    private int readFromSerial() {
+
+        int numBytesRead;
+
+        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
+        if (availableDrivers.isEmpty()) {
+            TextView textView = new TextView(this);
+            textView.setTextSize(40);
+            textView.setText(Integer.toString(-1));
+            setContentView(textView);
+            return -1;
+        }
+
+        UsbSerialDriver driver = availableDrivers.get(0);
+        UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
+
+        if (connection == null) {
+            TextView textView = new TextView(this);
+            textView.setTextSize(40);
+            textView.setText(Integer.toString(-1));
+            setContentView(textView);
+            return -1;
+        }
+
+        try {
+            sPort = driver.getPorts().get(0);
+            sPort.open(connection);
+            sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+
+            byte buffer[] = new byte[16];
+            numBytesRead = sPort.read(buffer, 500);
+        } catch (IOException e) {
+            // Deal with error.
+            try {
+                sPort.close();
+            } catch (IOException e2) {
+                // Ignore.
+            }
+            sPort = null;
+            return -1;
+        }
+
+        TextView textView = new TextView(this);
+        textView.setTextSize(40);
+        textView.setText(Integer.toString(numBytesRead));
+        setContentView(textView);
+        return numBytesRead;
+
+
     }
 }
