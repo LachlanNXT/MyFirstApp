@@ -120,23 +120,6 @@ public class MyActivity extends AppCompatActivity {
             }
         }
 
-        /*
-        // Find all available drivers from attached devices.
-        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-        if (availableDrivers.isEmpty()) {
-            return;
-        }
-
-        // Open a connection to the first available driver.
-        UsbSerialDriver driver = availableDrivers.get(0);
-        UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
-
-        if (connection == null) {
-            return;
-        }
-        */
-
         try {
 
             sPort.write(sendable, 500);
@@ -159,29 +142,6 @@ public class MyActivity extends AppCompatActivity {
 
         int numBytesRead;
         byte buffer[] = new byte[16];
-
-        /*
-        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-        if (availableDrivers.isEmpty()) {
-            TextView textView = new TextView(this);
-            textView.setTextSize(40);
-            textView.setText(Integer.toString(-1));
-            setContentView(textView);
-            return new SerialReadData(-1, new byte[16]);
-        }
-
-        UsbSerialDriver driver = availableDrivers.get(0);
-        UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
-
-        if (connection == null) {
-            TextView textView = new TextView(this);
-            textView.setTextSize(40);
-            textView.setText(Integer.toString(-1));
-            setContentView(textView);
-            return new SerialReadData(-1, new byte[16]);
-        }
-        */
 
         try {
 
