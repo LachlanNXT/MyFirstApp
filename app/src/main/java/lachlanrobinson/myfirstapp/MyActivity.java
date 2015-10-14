@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
@@ -25,6 +26,12 @@ public class MyActivity extends AppCompatActivity {
     // initialise required variables for serial communication
     SerialReadData readResult = new SerialReadData(-1, new byte[16]);
     private static UsbSerialPort sPort = null;
+    UsbManager manager;
+    List<UsbSerialDriver> availableDrivers;
+
+    UsbSerialDriver driver;
+    UsbDeviceConnection connection;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,7 @@ public class MyActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_my, menu);
+        StartSerial();
         return true;
     }
 
@@ -58,7 +66,7 @@ public class MyActivity extends AppCompatActivity {
                 return true;
 
             case R.id.send_serial:
-                message = "a";
+                message = "L9";
                 writeToSerial(message.getBytes());
                 return true;
 
@@ -112,6 +120,7 @@ public class MyActivity extends AppCompatActivity {
             }
         }
 
+        /*
         // Find all available drivers from attached devices.
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
@@ -126,21 +135,22 @@ public class MyActivity extends AppCompatActivity {
         if (connection == null) {
             return;
         }
+        */
 
         try {
-            sPort = driver.getPorts().get(0);
-            sPort.open(connection);
-            sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
 
             sPort.write(sendable, 500);
+
         } catch (IOException e) {
             // Deal with error.
             try {
                 sPort.close();
+                Toast.makeText(this, "Serial Error - Closed", Toast.LENGTH_LONG).show();
             } catch (IOException e2) {
                 // Ignore.
             }
             sPort = null;
+            Toast.makeText(this, "Serial Error - Port set to Null", Toast.LENGTH_LONG).show();
             return;
         }
     }
@@ -150,6 +160,7 @@ public class MyActivity extends AppCompatActivity {
         int numBytesRead;
         byte buffer[] = new byte[16];
 
+        /*
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
         if (availableDrivers.isEmpty()) {
@@ -170,11 +181,9 @@ public class MyActivity extends AppCompatActivity {
             setContentView(textView);
             return new SerialReadData(-1, new byte[16]);
         }
+        */
 
         try {
-            sPort = driver.getPorts().get(0);
-            sPort.open(connection);
-            sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
 
             numBytesRead = sPort.read(buffer, 500);
 
@@ -182,10 +191,12 @@ public class MyActivity extends AppCompatActivity {
             // Deal with error.
             try {
                 sPort.close();
+                Toast.makeText(this, "Serial Error - Closed", Toast.LENGTH_LONG).show();
             } catch (IOException e2) {
                 // Ignore.
             }
             sPort = null;
+            Toast.makeText(this, "Serial Error - Port set to Null", Toast.LENGTH_LONG).show();
             return new SerialReadData(-1, new byte[16]);
         }
 
@@ -198,5 +209,48 @@ public class MyActivity extends AppCompatActivity {
         textView.setText(Integer.toString(numBytesRead) + " " + message);
         setContentView(textView);
         return new SerialReadData(numBytesRead, buffer);
+    }
+
+    public void StartSerial() {
+
+        manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
+        if (availableDrivers.isEmpty()) {
+
+            Toast.makeText(this, "Serial Error", Toast.LENGTH_LONG).show();
+        } else {
+
+            driver = availableDrivers.get(0);
+            connection = manager.openDevice(driver.getDevice());
+
+            if (connection == null) {
+
+                Toast.makeText(this, "Serial Error 2", Toast.LENGTH_LONG).show();
+
+            } else {
+
+                try {
+
+                    sPort = driver.getPorts().get(0);
+                    sPort.open(connection);
+                    sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+
+                    Toast.makeText(this, "Serial OK!", Toast.LENGTH_LONG).show();
+
+                } catch (IOException e) {
+                    // Deal with error.
+                    try {
+                        sPort.close();
+                        Toast.makeText(this, "Serial Error - opening Closed", Toast.LENGTH_LONG).show();
+                    } catch (IOException e2) {
+                        // Ignore.
+                    }
+                    sPort = null;
+                    Toast.makeText(this, "Serial Error - opening Port set to Null", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
+
     }
 }
